@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNN Mobile Vault v2</title>
+<style>
+  * { box-sizing: border-box; }
+  
+  body {
+    margin: 0;
+    padding: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f5f5; /* Page background stays gray */
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* SNN CONTAINER - Precision Height to eliminate gray void */
+  .snn-container {
+    width: 350px;
+    max-width: 100%;
+    height: 450px; /* Locked height */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Tab Navigation */
+  .tab-bar {
+    display: flex;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  
+  .tab-button {
+    flex: 1;
+    padding: 15px 5px;
+    border: none;
+    background: none;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+  }
+  
+  .tab-button.active {
+    color: #000;
+    background: white;
+    border-bottom-color: #000;
+  }
+  
+  /* CONTENT AREA - Set to White to blend with Google Forms */
+  .content-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff; /* This hides the gray "Grit" */
+  }
+  
+  .tab-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: white; /* Panel background matches form */
+  }
+  
+  .tab-panel.active { display: block; }
+
+  /* IFRAME - Forced to fill the panel completely */
+  .tab-panel iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: white;
+  }
+  
+  .dummy-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="snn-container">
+  <div class="tab-bar">
+    <button class="tab-button active" data-tab="form">Form</button>
+    <button class="tab-button" data-tab="vault">Results</button>
+    <button class="tab-button" data-tab="archive">Archive</button>
+    <button class="tab-button" data-tab="protocol">Protocol</button>
+  </div>
+  
+  <div class="content-area">
+    <div class="tab-panel active" id="form">
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
+    </div>
+    
+    <div class="tab-panel" id="vault">
+      <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&single=true&widget=false&headers=false&chrome=false"></iframe>
+    </div>
+    
+    <div class="tab-panel" id="archive">
+      <div class="dummy-content">
+        <p>The sounds of the heartbeat...</p>
+      </div>
+    </div>
+    
+    <div class="tab-panel" id="protocol">
+      <div class="dummy-content">
+        <p>Seeking the "Honest No".</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.dataset.tab;
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      tabPanels.forEach(panel => {
+        panel.classList.toggle('active', panel.id === targetTab);
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
