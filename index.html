@@ -46,35 +46,28 @@
   .vault-window::-webkit-scrollbar { display: none !important; }
   .vault-window { -ms-overflow-style: none !important; scrollbar-width: none !important; }
   
-  /* Use absolute positioning instead of display none */
+  /* FIXED: Use display none for hidden tabs */
   .tab-content { 
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
+    display: none !important;
     width: 100% !important;
+    height: 100% !important;
     padding: 0 !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
+    margin: 0 !important;
   }
   
-  /* Active tab is visible and interactive */
+  /* Active tab uses block display */
   .tab-content.snn-active { 
-    position: relative !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    z-index: 10 !important;
+    display: block !important;
   }
   
-  /* Ensure iframes are always rendered */
+  /* Ensure iframes don't create extra space */
   .tab-content iframe {
     display: block !important;
     width: 100% !important;
     height: 1500px !important;
     border: none !important;
-    visibility: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   .dummy-data {
@@ -125,13 +118,11 @@
   'use strict';
   
   function switchTab(tabId) {
-    // Remove active from all tabs
+    // Hide all tabs completely
     var allTabs = document.querySelectorAll('.tab-content');
     allTabs.forEach(function(tab) {
       tab.classList.remove('snn-active');
       tab.style.display = 'none';
-      tab.style.visibility = 'hidden';
-      tab.style.opacity = '0';
     });
     
     // Remove active from all buttons
@@ -140,16 +131,11 @@
       btn.classList.remove('snn-active');
     });
     
-    // Activate selected tab
+    // Show selected tab
     var targetTab = document.getElementById(tabId);
     if (targetTab) {
       targetTab.style.display = 'block';
-      targetTab.style.visibility = 'visible';
-      targetTab.style.opacity = '1';
       targetTab.classList.add('snn-active');
-      
-      // Force reflow
-      targetTab.offsetHeight;
     }
     
     // Activate button
@@ -191,15 +177,5 @@
   } else {
     init();
   }
-  
-  // Re-check visibility every 2 seconds as a failsafe
-  setInterval(function() {
-    var activeTab = document.querySelector('.tab-content.snn-active');
-    if (activeTab) {
-      activeTab.style.display = 'block';
-      activeTab.style.visibility = 'visible';
-      activeTab.style.opacity = '1';
-    }
-  }, 2000);
 })();
 </script>
