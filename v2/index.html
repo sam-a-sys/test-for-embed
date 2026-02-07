@@ -1,0 +1,419 @@
+<style>
+  /* THE SNN TAB VARNISH */
+  .tab-system { 
+    font-family: sans-serif; 
+    border: 1px solid #eee; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    max-width: 100%;
+  }
+  
+  .tab-buttons { 
+    display: flex; 
+    background: #f9f9f9; 
+    border-bottom: 1px solid #eee; 
+    overflow-x: auto; 
+    flex-wrap: wrap;
+  }
+  
+  .tab-btn { 
+    padding: 14px 24px; 
+    border: none; 
+    background: none; 
+    cursor: pointer; 
+    font-size: 12px;
+    font-weight: 600; 
+    color: #888; 
+    transition: 0.3s; 
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .tab-btn.snn-active { 
+    color: #000 !important; 
+    border-bottom: 3px solid #000 !important; 
+    background: #fff !important; 
+  }
+  
+  /* ZOOM CONTROLS */
+  .zoom-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .zoom-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: #666;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .zoom-btn:hover {
+    background: #f0f0f0;
+    border-color: #999;
+    color: #000;
+  }
+  
+  .zoom-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .zoom-slider {
+    width: 150px;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+  }
+  
+  .zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .zoom-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+  
+  .zoom-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+  }
+  
+  .zoom-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+  }
+  
+  .zoom-level {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    min-width: 50px;
+    text-align: center;
+  }
+  
+  /* STRICT CONTAINER - prevents content from escaping */
+  .vault-window { 
+    height: 800px !important; 
+    max-height: 800px !important;
+    min-height: 800px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #fff !important;
+  }
+  
+  .vault-window::-webkit-scrollbar { display: none !important; }
+  .vault-window { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+  
+  /* Each tab content is strictly contained */
+  .tab-content { 
+    display: none !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform-origin: top left !important;
+    transition: transform 0.2s ease !important;
+  }
+  
+  /* Active tab */
+  .tab-content.snn-active { 
+    display: block !important;
+    z-index: 10 !important;
+  }
+  
+  /* iframe wrapper - additional containment layer */
+  .iframe-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
+  
+  /* Ensure iframes are strictly contained */
+  .tab-content iframe {
+    display: block !important;
+    width: 100% !important;
+    height: 1500px !important;
+    min-height: 1500px !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .dummy-data {
+    padding: 40px;
+    text-align: center;
+    color: #ccc;
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 11px;
+    }
+    
+    .zoom-slider {
+      width: 100px;
+    }
+    
+    .vault-window {
+      height: 600px !important;
+      max-height: 600px !important;
+      min-height: 600px !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .tab-btn {
+      padding: 10px 12px;
+      font-size: 10px;
+    }
+    
+    .zoom-controls {
+      padding: 8px;
+      gap: 8px;
+    }
+    
+    .zoom-btn {
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
+    }
+    
+    .vault-window {
+      height: 500px !important;
+      max-height: 500px !important;
+      min-height: 500px !important;
+    }
+  }
+</style>
+
+<div class="tab-system">
+  <div class="tab-buttons">
+    <button class="tab-btn snn-active" data-tab="tab1">Form Input</button>
+    <button class="tab-btn" data-tab="tab2">Vault Results</button>
+    <button class="tab-btn" data-tab="tab3">Archive</button>
+    <button class="tab-btn" data-tab="tab4">SNN Protocol</button>
+  </div>
+  
+  <!-- ZOOM CONTROLS -->
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
+    <input type="range" class="zoom-slider" id="zoom-slider" min="50" max="150" value="100" step="5">
+    <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
+    <span class="zoom-level" id="zoom-display">100%</span>
+  </div>
+  
+  <div class="vault-window" id="snn-main-viewport">
+    <div id="tab1" class="tab-content snn-active">
+      <div class="iframe-wrapper">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
+      </div>
+    </div>
+    
+    <div id="tab2" class="tab-content">
+      <div class="iframe-wrapper">
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false&amp;chrome=false"></iframe>
+      </div>
+    </div>
+    
+    <div id="tab3" class="tab-content">
+      <div class="dummy-data">
+        <p>The sounds of the heartbeat echoing in their ears...</p>
+        <p style="font-size: 10px; margin-top: 20px;">[ ARCHIVE LOCKED - PENDING VERIFICATION ]</p>
+      </div>
+    </div>
+    
+    <div id="tab4" class="tab-content">
+      <div class="dummy-data">
+        <p>Seeking out the "Honest No" of the food.</p>
+        <p style="font-size: 10px; margin-top: 20px;">[ SNN SIGNATURE REQUIRED ]</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  var currentZoom = 100;
+  
+  function switchTab(tabId) {
+    // Hide all tabs
+    var allTabs = document.querySelectorAll('.tab-content');
+    allTabs.forEach(function(tab) {
+      tab.classList.remove('snn-active');
+    });
+    
+    // Remove active from all buttons
+    var allButtons = document.querySelectorAll('.tab-btn');
+    allButtons.forEach(function(btn) {
+      btn.classList.remove('snn-active');
+    });
+    
+    // Show selected tab
+    var targetTab = document.getElementById(tabId);
+    if (targetTab) {
+      targetTab.classList.add('snn-active');
+      applyZoom(currentZoom); // Apply current zoom to new tab
+    }
+    
+    // Activate button
+    var targetButton = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+    if (targetButton) {
+      targetButton.classList.add('snn-active');
+    }
+    
+    // Reset scroll position of the tab content
+    if (targetTab) {
+      var wrapper = targetTab.querySelector('.iframe-wrapper');
+      if (wrapper) {
+        wrapper.scrollTop = 0;
+      } else {
+        targetTab.scrollTop = 0;
+      }
+    }
+  }
+  
+  function applyZoom(zoomLevel) {
+    currentZoom = zoomLevel;
+    var scale = zoomLevel / 100;
+    
+    // Apply zoom to active tab only
+    var activeTab = document.querySelector('.tab-content.snn-active');
+    if (activeTab) {
+      activeTab.style.transform = 'scale(' + scale + ')';
+      
+      // Adjust width to compensate for scale
+      var adjustedWidth = (100 / scale) + '%';
+      activeTab.style.width = adjustedWidth;
+      
+      // Adjust height container
+      var wrapper = activeTab.querySelector('.iframe-wrapper');
+      if (wrapper) {
+        wrapper.style.height = (100 / scale) + '%';
+      }
+    }
+    
+    // Update display
+    document.getElementById('zoom-display').textContent = zoomLevel + '%';
+    document.getElementById('zoom-slider').value = zoomLevel;
+  }
+  
+  function setupZoomControls() {
+    var slider = document.getElementById('zoom-slider');
+    var zoomInBtn = document.getElementById('zoom-in');
+    var zoomOutBtn = document.getElementById('zoom-out');
+    
+    // Slider control
+    slider.addEventListener('input', function() {
+      applyZoom(parseInt(this.value));
+    });
+    
+    // Zoom in button
+    zoomInBtn.addEventListener('click', function() {
+      var newZoom = Math.min(150, currentZoom + 10);
+      applyZoom(newZoom);
+    });
+    
+    // Zoom out button
+    zoomOutBtn.addEventListener('click', function() {
+      var newZoom = Math.max(50, currentZoom - 10);
+      applyZoom(newZoom);
+    });
+    
+    // Keyboard shortcuts (Ctrl/Cmd + and -)
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey)) {
+        if (e.key === '=' || e.key === '+') {
+          e.preventDefault();
+          var newZoom = Math.min(150, currentZoom + 10);
+          applyZoom(newZoom);
+        } else if (e.key === '-') {
+          e.preventDefault();
+          var newZoom = Math.max(50, currentZoom - 10);
+          applyZoom(newZoom);
+        } else if (e.key === '0') {
+          e.preventDefault();
+          applyZoom(100);
+        }
+      }
+    });
+  }
+  
+  // Add click listeners for tabs
+  function init() {
+    var buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(function(button) {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var tabId = this.getAttribute('data-tab');
+        if (tabId) {
+          switchTab(tabId);
+        }
+      });
+    });
+    
+    // Setup zoom controls
+    setupZoomControls();
+    
+    // Ensure first tab is visible on load
+    setTimeout(function() {
+      switchTab('tab1');
+      applyZoom(100);
+    }, 100);
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
