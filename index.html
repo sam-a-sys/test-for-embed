@@ -36,35 +36,56 @@
     background: #fff !important; 
   }
   
+  /* STRICT CONTAINER - prevents content from escaping */
   .vault-window { 
-    height: 800px; 
-    overflow-y: auto; 
-    position: relative; 
-    background: #fff;
+    height: 800px !important; 
+    max-height: 800px !important;
+    min-height: 800px !important;
+    overflow: hidden !important; /* Changed from auto to hidden */
+    position: relative !important;
+    background: #fff !important;
   }
   
   .vault-window::-webkit-scrollbar { display: none !important; }
   .vault-window { -ms-overflow-style: none !important; scrollbar-width: none !important; }
   
-  /* FIXED: Use display none for hidden tabs */
+  /* Each tab content is strictly contained */
   .tab-content { 
     display: none !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     width: 100% !important;
     height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding: 0 !important;
     margin: 0 !important;
   }
   
-  /* Active tab uses block display */
+  /* Active tab */
   .tab-content.snn-active { 
     display: block !important;
+    z-index: 10 !important;
   }
   
-  /* Ensure iframes don't create extra space */
+  /* iframe wrapper - additional containment layer */
+  .iframe-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
+  
+  /* Ensure iframes are strictly contained */
   .tab-content iframe {
     display: block !important;
     width: 100% !important;
     height: 800px !important;
+    min-height: 700px !important;
     border: none !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -90,25 +111,29 @@
   
   <div class="vault-window" id="snn-main-viewport">
     <div id="tab1" class="tab-content snn-active">
-       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
+      <div class="iframe-wrapper">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
+      </div>
     </div>
     
     <div id="tab2" class="tab-content">
-       <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false&amp;chrome=false"></iframe>
+      <div class="iframe-wrapper">
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false&amp;chrome=false"></iframe>
+      </div>
     </div>
     
     <div id="tab3" class="tab-content">
-       <div class="dummy-data">
-         <p>The sounds of the heartbeat echoing in their ears...</p>
-         <p style="font-size: 10px; margin-top: 20px;">[ ARCHIVE LOCKED - PENDING VERIFICATION ]</p>
-       </div>
+      <div class="dummy-data">
+        <p>The sounds of the heartbeat echoing in their ears...</p>
+        <p style="font-size: 10px; margin-top: 20px;">[ ARCHIVE LOCKED - PENDING VERIFICATION ]</p>
+      </div>
     </div>
     
     <div id="tab4" class="tab-content">
-       <div class="dummy-data">
-         <p>Seeking out the "Honest No" of the food.</p>
-         <p style="font-size: 10px; margin-top: 20px;">[ SNN SIGNATURE REQUIRED ]</p>
-       </div>
+      <div class="dummy-data">
+        <p>Seeking out the "Honest No" of the food.</p>
+        <p style="font-size: 10px; margin-top: 20px;">[ SNN SIGNATURE REQUIRED ]</p>
+      </div>
     </div>
   </div>
 </div>
@@ -118,11 +143,10 @@
   'use strict';
   
   function switchTab(tabId) {
-    // Hide all tabs completely
+    // Hide all tabs
     var allTabs = document.querySelectorAll('.tab-content');
     allTabs.forEach(function(tab) {
       tab.classList.remove('snn-active');
-      tab.style.display = 'none';
     });
     
     // Remove active from all buttons
@@ -134,7 +158,6 @@
     // Show selected tab
     var targetTab = document.getElementById(tabId);
     if (targetTab) {
-      targetTab.style.display = 'block';
       targetTab.classList.add('snn-active');
     }
     
@@ -144,10 +167,14 @@
       targetButton.classList.add('snn-active');
     }
     
-    // Scroll to top
-    var viewport = document.getElementById('snn-main-viewport');
-    if (viewport) {
-      viewport.scrollTop = 0;
+    // Reset scroll position of the tab content
+    if (targetTab) {
+      var wrapper = targetTab.querySelector('.iframe-wrapper');
+      if (wrapper) {
+        wrapper.scrollTop = 0;
+      } else {
+        targetTab.scrollTop = 0;
+      }
     }
   }
   
