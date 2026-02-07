@@ -1,4 +1,13 @@
 <style>
+  /* Wrapper for the entire system to apply zoom */
+  .tab-system-wrapper {
+    transform-origin: top center;
+    transition: transform 0.2s ease;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+  
   /* THE SNN TAB VARNISH */
   .tab-system { 
     font-family: sans-serif; 
@@ -149,8 +158,6 @@
     overflow-x: hidden !important;
     padding: 0 !important;
     margin: 0 !important;
-    transform-origin: top left !important;
-    transition: transform 0.2s ease !important;
   }
   
   /* Active tab */
@@ -231,46 +238,49 @@
   }
 </style>
 
-<div class="tab-system">
-  <div class="tab-buttons">
-    <button class="tab-btn snn-active" data-tab="tab1">Form Input</button>
-    <button class="tab-btn" data-tab="tab2">Vault Results</button>
-    <button class="tab-btn" data-tab="tab3">Archive</button>
-    <button class="tab-btn" data-tab="tab4">SNN Protocol</button>
-  </div>
-  
-  <!-- ZOOM CONTROLS -->
-  <div class="zoom-controls">
-    <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
-    <input type="range" class="zoom-slider" id="zoom-slider" min="50" max="150" value="100" step="5">
-    <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
-    <span class="zoom-level" id="zoom-display">100%</span>
-  </div>
-  
-  <div class="vault-window" id="snn-main-viewport">
-    <div id="tab1" class="tab-content snn-active">
-      <div class="iframe-wrapper">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
-      </div>
+<!-- WRAPPER for entire system -->
+<div class="tab-system-wrapper" id="snn-wrapper">
+  <div class="tab-system">
+    <div class="tab-buttons">
+      <button class="tab-btn snn-active" data-tab="tab1">Form Input</button>
+      <button class="tab-btn" data-tab="tab2">Vault Results</button>
+      <button class="tab-btn" data-tab="tab3">Archive</button>
+      <button class="tab-btn" data-tab="tab4">SNN Protocol</button>
     </div>
     
-    <div id="tab2" class="tab-content">
-      <div class="iframe-wrapper">
-        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false&amp;chrome=false"></iframe>
-      </div>
+    <!-- ZOOM CONTROLS -->
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
+      <input type="range" class="zoom-slider" id="zoom-slider" min="50" max="150" value="100" step="5">
+      <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
+      <span class="zoom-level" id="zoom-display">100%</span>
     </div>
     
-    <div id="tab3" class="tab-content">
-      <div class="dummy-data">
-        <p>The sounds of the heartbeat echoing in their ears...</p>
-        <p style="font-size: 10px; margin-top: 20px;">[ ARCHIVE LOCKED - PENDING VERIFICATION ]</p>
+    <div class="vault-window" id="snn-main-viewport">
+      <div id="tab1" class="tab-content snn-active">
+        <div class="iframe-wrapper">
+          <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
+        </div>
       </div>
-    </div>
-    
-    <div id="tab4" class="tab-content">
-      <div class="dummy-data">
-        <p>Seeking out the "Honest No" of the food.</p>
-        <p style="font-size: 10px; margin-top: 20px;">[ SNN SIGNATURE REQUIRED ]</p>
+      
+      <div id="tab2" class="tab-content">
+        <div class="iframe-wrapper">
+          <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false&amp;chrome=false"></iframe>
+        </div>
+      </div>
+      
+      <div id="tab3" class="tab-content">
+        <div class="dummy-data">
+          <p>The sounds of the heartbeat echoing in their ears...</p>
+          <p style="font-size: 10px; margin-top: 20px;">[ ARCHIVE LOCKED - PENDING VERIFICATION ]</p>
+        </div>
+      </div>
+      
+      <div id="tab4" class="tab-content">
+        <div class="dummy-data">
+          <p>Seeking out the "Honest No" of the food.</p>
+          <p style="font-size: 10px; margin-top: 20px;">[ SNN SIGNATURE REQUIRED ]</p>
+        </div>
       </div>
     </div>
   </div>
@@ -299,7 +309,6 @@
     var targetTab = document.getElementById(tabId);
     if (targetTab) {
       targetTab.classList.add('snn-active');
-      applyZoom(currentZoom); // Apply current zoom to new tab
     }
     
     // Activate button
@@ -323,20 +332,10 @@
     currentZoom = zoomLevel;
     var scale = zoomLevel / 100;
     
-    // Apply zoom to active tab only
-    var activeTab = document.querySelector('.tab-content.snn-active');
-    if (activeTab) {
-      activeTab.style.transform = 'scale(' + scale + ')';
-      
-      // Adjust width to compensate for scale
-      var adjustedWidth = (100 / scale) + '%';
-      activeTab.style.width = adjustedWidth;
-      
-      // Adjust height container
-      var wrapper = activeTab.querySelector('.iframe-wrapper');
-      if (wrapper) {
-        wrapper.style.height = (100 / scale) + '%';
-      }
+    // Apply zoom to ENTIRE wrapper (includes tabs, buttons, everything)
+    var wrapper = document.getElementById('snn-wrapper');
+    if (wrapper) {
+      wrapper.style.transform = 'scale(' + scale + ')';
     }
     
     // Update display
