@@ -343,24 +343,6 @@
 
 </body>
 </html>
-```
-
-## **✨ What's New in This Approach:**
-
-### **1. Fixed Dimensions**
-- **Container**: Exactly `550px × 800px`
-- Uses `flexbox` layout for perfect space distribution
-
-### **2. Form Fills Completely**
-- iframes use `width: 100%; height: 100%;`
-- Content area uses `flex: 1` to take all remaining space
-- No extra wrappers or nested divs
-
-### **3. Cleaner Architecture**
-```
-snn-container (550×800)
-├── tab-bar (fixed height)
-├── zoom-bar (fixed height)
 └── content-area (fills remaining space)
     ├── tab-panel (100% of content-area)
     └── iframe (100% of panel)
