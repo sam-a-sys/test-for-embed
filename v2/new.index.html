@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNN Master Vault</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f5f5;
+  }
+  
+  /* Main container - FIXED DIMENSIONS */
+  .snn-container {
+    width: 550px;
+    height: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform-origin: top left;
+    transition: transform 0.2s ease;
+  }
+  
+  /* Tab buttons row */
+  .tab-bar {
+    display: flex;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  
+  .tab-button {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    background: none;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+  }
+  
+  .tab-button:hover {
+    background: #f0f0f0;
+    color: #555;
+  }
+  
+  .tab-button.active {
+    color: #000;
+    background: white;
+    border-bottom-color: #000;
+  }
+  
+  /* Zoom controls row */
+  .zoom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  
+  .zoom-button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  
+  .zoom-button:hover {
+    background: #f0f0f0;
+    border-color: #999;
+  }
+  
+  .zoom-button:active {
+    transform: scale(0.9);
+  }
+  
+  .zoom-slider {
+    width: 120px;
+    height: 5px;
+    -webkit-appearance: none;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+  }
+  
+  .zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .zoom-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .zoom-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    min-width: 45px;
+    text-align: center;
+  }
+  
+  /* Content area - fills remaining space */
+  .content-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: white;
+  }
+  
+  /* Individual tab panels */
+  .tab-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    overflow: auto;
+  }
+  
+  .tab-panel.active {
+    display: block;
+  }
+  
+  /* Hide scrollbars but keep functionality */
+  .tab-panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .tab-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .tab-panel::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+  
+  .tab-panel::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+  
+  /* iframes fill their panel completely */
+  .tab-panel iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    border: none;
+    display: block;
+  }
+  
+  /* Dummy content styling */
+  .dummy-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 40px;
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+  }
+  
+  .dummy-content p {
+    margin: 10px 0;
+  }
+  
+  .dummy-subtitle {
+    font-size: 10px;
+    margin-top: 30px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="snn-container" id="mainContainer">
+  
+  <!-- Tab Navigation -->
+  <div class="tab-bar">
+    <button class="tab-button active" data-tab="form">Form Input</button>
+    <button class="tab-button" data-tab="vault">Vault Results</button>
+    <button class="tab-button" data-tab="archive">Archive</button>
+    <button class="tab-button" data-tab="protocol">SNN Protocol</button>
+  </div>
+  
+  <!-- Zoom Controls -->
+  <div class="zoom-bar">
+    <button class="zoom-button" id="zoomOut">−</button>
+    <input type="range" class="zoom-slider" id="zoomSlider" min="50" max="150" value="100" step="5">
+    <button class="zoom-button" id="zoomIn">+</button>
+    <span class="zoom-label" id="zoomLabel">100%</span>
+  </div>
+  
+  <!-- Content Area -->
+  <div class="content-area">
+    
+    <!-- Tab 1: Form -->
+    <div class="tab-panel active" id="form">
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeDGekkZsJcPq8pL--b5brKobKrLox-0ktfofiO0TkKc39RgQ/viewform?embedded=true"></iframe>
+    </div>
+    
+    <!-- Tab 2: Vault Results -->
+    <div class="tab-panel" id="vault">
+      <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTuKRlZV-7OyUpi4jvECqyOgwEhOFs7OpBXCq9zY3s7o52k3WBp9G25xP_DjtLWOpdXForpozskU9a1/pubhtml?gid=0&single=true&widget=false&headers=false&chrome=false"></iframe>
+    </div>
+    
+    <!-- Tab 3: Archive -->
+    <div class="tab-panel" id="archive">
+      <div class="dummy-content">
+        <p>The sounds of the heartbeat echoing in their ears...</p>
+        <p class="dummy-subtitle">[ ARCHIVE LOCKED - PENDING VERIFICATION ]</p>
+      </div>
+    </div>
+    
+    <!-- Tab 4: Protocol -->
+    <div class="tab-panel" id="protocol">
+      <div class="dummy-content">
+        <p>Seeking out the "Honest No" of the food.</p>
+        <p class="dummy-subtitle">[ SNN SIGNATURE REQUIRED ]</p>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  let currentZoom = 100;
+  const container = document.getElementById('mainContainer');
+  const zoomSlider = document.getElementById('zoomSlider');
+  const zoomLabel = document.getElementById('zoomLabel');
+  const zoomInBtn = document.getElementById('zoomIn');
+  const zoomOutBtn = document.getElementById('zoomOut');
+  
+  // Tab switching
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.dataset.tab;
+      
+      // Update buttons
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      
+      // Update panels
+      tabPanels.forEach(panel => {
+        if (panel.id === targetTab) {
+          panel.classList.add('active');
+          panel.scrollTop = 0; // Reset scroll
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+    });
+  });
+  
+  // Zoom functionality
+  function setZoom(value) {
+    currentZoom = value;
+    const scale = value / 100;
+    container.style.transform = `scale(${scale})`;
+    zoomLabel.textContent = `${value}%`;
+    zoomSlider.value = value;
+  }
+  
+  zoomSlider.addEventListener('input', (e) => {
+    setZoom(parseInt(e.target.value));
+  });
+  
+  zoomInBtn.addEventListener('click', () => {
+    const newZoom = Math.min(150, currentZoom + 10);
+    setZoom(newZoom);
+  });
+  
+  zoomOutBtn.addEventListener('click', () => {
+    const newZoom = Math.max(50, currentZoom - 10);
+    setZoom(newZoom);
+  });
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === '=' || e.key === '+') {
+        e.preventDefault();
+        setZoom(Math.min(150, currentZoom + 10));
+      } else if (e.key === '-') {
+        e.preventDefault();
+        setZoom(Math.max(50, currentZoom - 10));
+      } else if (e.key === '0') {
+        e.preventDefault();
+        setZoom(100);
+      }
+    }
+  });
+  
+})();
+</script>
+
+</body>
+</html>
+```
+
+## **✨ What's New in This Approach:**
+
+### **1. Fixed Dimensions**
+- **Container**: Exactly `550px × 800px`
+- Uses `flexbox` layout for perfect space distribution
+
+### **2. Form Fills Completely**
+- iframes use `width: 100%; height: 100%;`
+- Content area uses `flex: 1` to take all remaining space
+- No extra wrappers or nested divs
+
+### **3. Cleaner Architecture**
+```
+snn-container (550×800)
+├── tab-bar (fixed height)
+├── zoom-bar (fixed height)
+└── content-area (fills remaining space)
+    ├── tab-panel (100% of content-area)
+    └── iframe (100% of panel)
