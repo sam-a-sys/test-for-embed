@@ -38,6 +38,40 @@
     text-transform: uppercase; 
     letter-spacing: 1px; 
     text-align: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-title {
+    flex: 1;
+    text-align: center;
+    padding-right: 40px; /* Offset for the button on the right */
+  }
+
+  .refresh-button {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .refresh-button:hover {
+    background: #fff;
+    color: #000;
+  }
+
+  .refresh-button:active {
+    transform: scale(0.95);
   }
 
   .tab-bar {
@@ -106,7 +140,8 @@
 
 <div class="snn-container">
   <div class="widget-header">
-    Economic And Financial News
+    <span class="header-title">Economic And Financial News</span>
+    <button class="refresh-button" onclick="refreshAllTabs()">↻ Refresh</button>
   </div>
 
   <div class="tab-bar">
@@ -146,6 +181,7 @@
 </div>
 
 <script>
+  // Tab switching functionality
   const btns = document.querySelectorAll('.tab-button');
   const panels = document.querySelectorAll('.tab-panel');
   btns.forEach(b => {
@@ -156,6 +192,19 @@
       document.getElementById(b.dataset.tab).classList.add('active');
     }
   });
+
+  // Refresh all iframes
+  function refreshAllTabs() {
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach(iframe => {
+      const src = iframe.src;
+      iframe.src = '';
+      iframe.src = src;
+    });
+    
+    // Also reload the Fillout form by reloading the page
+    location.reload();
+  }
 </script>
 </body>
 </html>
